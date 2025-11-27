@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const API_BASE = 'http://localhost:1202'
+export const API_BASE = 'http://localhost:30043'
 export const api = axios.create({ baseURL: API_BASE })
 
 api.interceptors.request.use(cfg => {
