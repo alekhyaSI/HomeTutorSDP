@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-HomeTutorApplication<hometutor>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.hometutor.HomeTutorApplication",
+            "projectName": "hometutor",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

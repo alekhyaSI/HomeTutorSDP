@@ -1,0 +1,54 @@
+/* Import a modern variable font - must come before other rules */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--primary: #7C3AED;
+	--primary-light: #A78BFA;
+	--primary-dark: #5B21B6;
+	--background: #F9F9FB;
+	color-scheme: light;
+}
+
+@layer base {
+	html, body, #root {
+		background-color: var(--background);
+		color: #111827;
+		font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+	}
+}
+
+@layer components {
+	.container { @apply max-w-6xl mx-auto px-4; }
+
+	/* New design tokens */
+	.card { @apply bg-white rounded-2xl shadow-lg p-6 border border-neutral-200/50; }
+	.btn { @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-transform disabled:opacity-60; }
+	.btn-primary { background: linear-gradient(90deg,var(--primary),var(--primary-dark)); color: white; }
+	.btn-secondary { @apply bg-neutral-100 text-neutral-800 hover:bg-neutral-200; }
+	.btn-ghost { @apply bg-transparent text-neutral-800 hover:bg-neutral-100; }
+	.btn-ghost { @apply bg-transparent text-neutral-800 hover:bg-neutral-100; }
+	.btn-secondary { @apply bg-neutral-100 text-neutral-800 hover:bg-neutral-200; }
+	.input { @apply w-full px-3 py-2 rounded-lg border border-neutral-200 bg-white placeholder:text-neutral-400; }
+	.label { @apply text-sm text-neutral-600 font-medium; }
+	.badge { @apply inline-flex items-center px-2 py-1 text-xs rounded-full bg-neutral-100; }
+	table.table { @apply w-full text-sm; }
+	table.table th, table.table td { @apply p-3 border-b border-neutral-200; }
+
+	/* app shell helpers */
+	.bg-primary-gradient { background: linear-gradient(90deg,var(--primary),var(--primary-light)); }
+	.shadow-soft { box-shadow: 0 12px 30px rgba(99,102,241,0.07); }
+
+	/* App shell & panel */
+	.app-shell { @apply bg-gradient-to-b from-purple-50 to-purple-100 min-h-screen; }
+	.panel { @apply bg-white rounded-2xl shadow-2xl p-6; }
+}
+
+@layer utilities {
+	/* small utilities */
+	.shadow-soft { box-shadow: 0 6px 18px rgba(15,23,42,0.08); }
+	.muted { color: #6b7280; }
+}
