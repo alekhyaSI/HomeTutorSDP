@@ -1,14 +1,14 @@
-import axios from 'axios'
+import axios from 'axios';
 
-export const API_BASE = 'http://localhost:30043'
-export const api = axios.create({ baseURL: API_BASE })
+export const api = axios.create({
+  baseURL: 'http://localhost:30043', // your backend
+});
 
-api.interceptors.request.use(cfg => {
-  try{
-    const u = JSON.parse(localStorage.getItem('user'))
-    if(u?.token){ cfg.headers = cfg.headers || {}; cfg.headers.Authorization = 'Bearer '+u.token }
-  }catch(e){}
-  return cfg
-})
-
-export default api
+// 🔥 Automatically attach token
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers["Authorization"] = "Bearer " + token;
+  }
+  return config;
+});
