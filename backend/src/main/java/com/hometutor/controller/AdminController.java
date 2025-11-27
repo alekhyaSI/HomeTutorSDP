@@ -6,16 +6,20 @@ import com.hometutor.entity.User;
 import com.hometutor.service.BookingService;
 import com.hometutor.service.TutorService;
 import com.hometutor.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@CrossOrigin("*")  // ✅ FIX: Allow frontend to call admin APIs
 @RequestMapping("/api/admin")
 public class AdminController {
+
     private final UserService userService;
     private final TutorService tutorService;
     private final BookingService bookingService;
@@ -26,58 +30,60 @@ public class AdminController {
         this.bookingService = bookingService;
     }
 
+    private void ensureAdmin() {
+        var current = com.hometutor.auth.CurrentUser.get();
+        if (current == null)
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        if (!"ADMIN".equals(current.role))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
+    }
+
     @GetMapping("/pending")
     public List<User> pending(){
-        com.hometutor.auth.AuthTokenService.Principal current = com.hometutor.auth.CurrentUser.get();
-        if(current==null || !"ADMIN".equals(current.role)) throw new RuntimeException("Forbidden");
+        ensureAdmin();
         return userService.listPending();
     }
 
     @PutMapping("/approve/{userId}")
     public User approve(@PathVariable Long userId){
-        com.hometutor.auth.AuthTokenService.Principal current = com.hometutor.auth.CurrentUser.get();
-        if(current==null || !"ADMIN".equals(current.role)) throw new RuntimeException("Forbidden");
+        ensureAdmin();
         return userService.approve(userId);
     }
 
     @PutMapping("/reject/{userId}")
     public User reject(@PathVariable Long userId){
-        com.hometutor.auth.AuthTokenService.Principal current = com.hometutor.auth.CurrentUser.get();
-        if(current==null || !"ADMIN".equals(current.role)) throw new RuntimeException("Forbidden");
+        ensureAdmin();
         return userService.reject(userId);
     }
 
     @GetMapping("/users")
     public List<User> users(){
-        com.hometutor.auth.AuthTokenService.Principal current = com.hometutor.auth.CurrentUser.get();
-        if(current==null || !"ADMIN".equals(current.role)) throw new RuntimeException("Forbidden");
+        ensureAdmin();
         return userService.list();
     }
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id){
-        com.hometutor.auth.AuthTokenService.Principal current = com.hometutor.auth.CurrentUser.get();
-        if(current==null || !"ADMIN".equals(current.role)) throw new RuntimeException("Forbidden");
-        userService.delete(id); return ResponseEntity.ok().build(); }
+        ensureAdmin();
+        userService.delete(id);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping("/tutor-availability")
     public List<TutorProfile> tutorAvailability(){
-        com.hometutor.auth.AuthTokenService.Principal current = com.hometutor.auth.CurrentUser.get();
-        if(current==null || !"ADMIN".equals(current.role)) throw new RuntimeException("Forbidden");
+        ensureAdmin();
         return tutorService.list();
     }
 
     @GetMapping("/bookings")
     public List<BookingRequest> bookings(){
-        com.hometutor.auth.AuthTokenService.Principal current = com.hometutor.auth.CurrentUser.get();
-        if(current==null || !"ADMIN".equals(current.role)) throw new RuntimeException("Forbidden");
+        ensureAdmin();
         return bookingService.all();
     }
 
     @GetMapping("/dashboard")
     public Map<String,Object> dashboard(){
-        com.hometutor.auth.AuthTokenService.Principal current = com.hometutor.auth.CurrentUser.get();
-        if(current==null || !"ADMIN".equals(current.role)) throw new RuntimeException("Forbidden");
+        ensureAdmin();
 
         Map<String,Object> m = new HashMap<>();
         List<User> allUsers = userService.list();
@@ -89,12 +95,14 @@ public class AdminController {
         m.put("pendingApprovals", pending.size());
         m.put("totalTutors", tutors.size());
         m.put("totalBookings", bookings.size());
+        
         long pendingBookings = bookings.stream().filter(b -> b.getStatus() == BookingRequest.Status.PENDING).count();
         long approvedBookings = bookings.stream().filter(b -> b.getStatus() == BookingRequest.Status.APPROVED).count();
+        
         m.put("pendingBookings", pendingBookings);
         m.put("approvedBookings", approvedBookings);
-        // include a short list of recent bookings (ids)
         m.put("recentBookings", bookings.stream().map(BookingRequest::getId).limit(10).toList());
+
         return m;
     }
 }
