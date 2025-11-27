@@ -1,14 +1,3 @@
-import axios from 'axios';
-
 export const api = axios.create({
-  baseURL: 'http://localhost:30043', // your backend
-});
-
-// 🔥 Automatically attach token
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers["Authorization"] = "Bearer " + token;
-  }
-  return config;
+  baseURL: 'http://backend-service:1202',
 });
